@@ -207,6 +207,7 @@ with aba1:
         percentagem_deducao = float(regra_aplicada["deducao_base"])
         nota_fiscal = regra_aplicada["lei"]
         nome_conta_debito = regra_aplicada["conta_d"]
+        classe_conta = str(nome_conta_debito).strip().split()[0]
 
         if regra_aplicada["categoria"] == "Refeições e Restauração":
             foi_congresso = st.radio("Enquadramento:", ["Almoço normal da empresa", "Participação em congresso", "Organização do evento"])
@@ -239,6 +240,11 @@ with aba1:
                 nota_fiscal = "Gasolina: IVA totalmente excluído de dedução."
 
         #---------------- 🔒 SEPARAÇÃO ABSOLUTA DA CLASSE 7 (Baseada no nome da Categoria SQL)
+        # Antecipa a matemática comum a todas as categorias
+        taxa_iva_decimal = taxa_iva_opcao / 100
+        valor_base = round(total_fatura / (1 + taxa_iva_decimal), 2)
+        total_iva = round(total_fatura - valor_base, 2)
+        total_documento = round(valor_base + total_iva, 2)  # valor bruto padrão
         if "Vendas" in regra_aplicada["categoria"]:
             st.markdown("##### 📄 Natureza do Rendimento Emitido (Classe 7)")
             tipo_rendimento = st.radio(
@@ -252,6 +258,8 @@ with aba1:
             taxa_iva_decimal = taxa_iva_opcao / 100
             valor_base = round(total_fatura / (1 + taxa_iva_decimal), 2)
             total_iva = round(total_fatura - valor_base, 2)
+            #........VER_AQUI
+            #total_documento = round(valor_base + total_iva, 2)
 
             if "Mercadorias" in tipo_rendimento:
                 nome_conta_debito = "711 - Vendas de Mercadorias"
